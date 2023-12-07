@@ -55,7 +55,8 @@ def adjacentValidation(locationIndex, validation, size, turn, gridList):
     multiples = []
 
     # Right side
-
+    print(gridList)
+    print(gridList[locationIndex])
     if locationIndex < size ** 2:
 
         if gridList[locationIndex] != emptyBuilding:
@@ -65,8 +66,8 @@ def adjacentValidation(locationIndex, validation, size, turn, gridList):
 
             # Check if location at right border
             if locationIndex - 1 not in multiples:
-
-                return
+                validation = True
+                return validation
 
             multiples.clear()
 
@@ -80,8 +81,8 @@ def adjacentValidation(locationIndex, validation, size, turn, gridList):
 
             # Check if location at left border
             if locationIndex - 1 not in multiples:
-
-                return
+                validation = True
+                return validation
 
             multiples.clear()
 
@@ -90,17 +91,17 @@ def adjacentValidation(locationIndex, validation, size, turn, gridList):
     if locationIndex - 1 - size >= 0:
 
         if gridList[locationIndex - 1 - size] != emptyBuilding:
-
-            return
+            validation = True
+            return validation
     # Down
     # Check if location at up border
     if locationIndex - 1 + size < size ** 2:
 
         if gridList[locationIndex - 1 + size] != emptyBuilding:
+            validation = True
+            return validation
 
-            return
-
-    if turn > 1 and gridList[locationIndex - 1] == emptyBuilding:
+    if turn > 1 and (gridList[locationIndex - 1] == emptyBuilding or gridList[locationIndex + 1] == emptyBuilding or gridList[locationIndex - 1 + size] == emptyBuilding or gridList[locationIndex - 1 - size] == emptyBuilding):
         validation = False
         print("You must build next to an existing building.")
 
@@ -355,7 +356,7 @@ while True:
         playerChoice = input("Please enter your choice? ")
 
         # check if player wants to build
-        if playerChoice == "1":
+        if playerChoice == "1" or playerChoice == "2":
 
             # Check where to build
             # Input validation
@@ -383,15 +384,20 @@ while True:
                     break
 
             # Translate input to location on map
-            locationIndex = (rowList.index(
-                location[0]) + 1) + ((int(location[1]) - 1) * size)
+            if len(location) == 2:
+                locationIndex = (rowList.index(
+                    location[0]) + 1) + ((int(location[1]) - 1) * size)
 
+            elif len(location) == 3:
+                locationIndex = (rowList.index(
+                    location[0]) + 1) + ((int(location[1]) - 2) + (int(location[2]) - 1) * size)
+            print(locationIndex)
             # Validate placement
             # If location is adjacent.
             validation = adjacentValidation(
                 locationIndex, validation, size, turn, gridList)
 
-            # If location is occupied.
+            # If location is occupied
             if gridList[locationIndex - 1] != emptyBuilding:
                 print("This location is already occupied.")
                 validation = False
@@ -399,7 +405,7 @@ while True:
             while validation == False:
                 location = input("Where do you want to build a building? ")
                 locationIndex = (rowList.index(
-                    location[0]) + 1) + ((int(location[1]) - 1) * size)
+                    location[0]) + 1) + ((int(location[1]) - 2) + (int(location[2]) - 1) * size)
                 validation = adjacentValidation(
                     locationIndex, validation, size, turn, gridList)
 
@@ -411,39 +417,6 @@ while True:
             # Place the building on mapGrid
             gridList[locationIndex - 1] = building1
 
-        # Do the same thing again for the second option
-        elif playerChoice == "2":
-
-            # Translate input to location on map
-            locationIndex = (rowList.index(
-                location[0]) + 1) + ((int(location[1]) - 1) * size)
-
-            # Validate placement
-            # If location is adjacent.
-            validation = True
-            validation = adjacentValidation(
-                locationIndex, validation, size, turn, gridList)
-
-            # If location is occupied.
-            if gridList[locationIndex - 1] != emptyBuilding:
-                print("This location is already occupied.")
-                validation = False
-
-            while validation == False:
-                location = input("Where do you want to build a building? ")
-                locationIndex = (rowList.index(
-                    location[0]) + 1) + ((int(location[1]) - 1) * size)
-                validation = adjacentValidation(
-                    locationIndex, validation, size, turn, gridList)
-
-                if gridList[locationIndex - 1] != emptyBuilding:
-                    print("This location is already occupied.")
-                    validation = False
-                    continue
-
-            # Place the building on mapGrid
-            gridList[locationIndex - 1] = building2
-
         # Save the game
         elif playerChoice == "3":
             print("Not implemented.")
@@ -454,7 +427,7 @@ while True:
             print(" Returning to main menu! ")
             print("-------------------------")
             break
-        
+
          # For input validation
         else:
             print("Please enter a valid input.")
